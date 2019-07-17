@@ -5,7 +5,7 @@ using Memory_Map_Builder.Helper_Classes;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-    public struct Spell
+    public struct SpellData
     {
         public uint    Name;
         public uint    Description;
@@ -22,7 +22,7 @@ namespace Memory_Map_Builder.DataTypes
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-    public unsafe struct unsafeSpell
+    public unsafe struct unsafeSpellData
     {
         public       uint    Name;
         public       uint    Description;
@@ -34,10 +34,10 @@ namespace Memory_Map_Builder.DataTypes
         public       byte    Unk1;
         public       byte    AOE; // Most Likely Not AoE
         public fixed byte    Unknown[3];
-
-        public static implicit operator Spell(unsafeSpell spell)
+        public static implicit operator SpellData(unsafeSpellData spell)
         {
-            return *(Spell*) &spell;
+
+            return *(SpellData*) &spell;
         }
     }
 }

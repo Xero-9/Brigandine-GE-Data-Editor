@@ -1,5 +1,4 @@
-﻿// Not working I think the struct may be wrong.
-//#define DEBUG_MEMORY_STATGROWTH_BROKEN
+﻿//#define WORK_IN_PROGRESS
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -48,6 +47,7 @@ namespace Memory_Map_Builder
 
         /// <summary>
         /// Creates an instance of the <seealso cref="MemoryAccessor"/> class.
+        /// TODO: Create more factory methods to use things like strings and bin files directly.
         /// </summary>
         /// <param name="memoryMappedFile"></param>
         /// <returns>An instance of the accessor into the mapped file for easy access to the data structs.</returns>
@@ -57,20 +57,20 @@ namespace Memory_Map_Builder
 
         // The MemoryMappedFile that this unmanagedMemoryAccessor uses for getting and eventually setting that data.
         private MemoryMappedFile brigandineAsMappedFile;
-        // The view access that the safe buffer that this class uses in Initialize function comes from this view.
+        // The view accessor that the safe buffer that is used in the Initialize function comes from this view.
         private MemoryMappedViewAccessor thisViewAccessor;
         
         // The unsafe versions are used since they use arrays internally,
         // which may be needed for future functions related to data checking and writing,
         // and will likely become internal at a later time.
-        private AttackType[]            attackTypes;
-        private unsafeCastle[ ]         castles;
-        private unsafeDefaultKnight[ ]  defaultKnights;
-        private unsafeFighterDefault[ ] fighterDefaults;
-        private Item[ ]                 items;
-        private unsafeSpecialAttack[ ]  specialAttacks;
-        private unsafeSpell[ ]          spells;
-        private Skill[ ]                skills;
+        private AttackData[]            attackDatas;
+        private unsafeCastleData[ ]         castles;
+        private unsafeDefaultKnightData[ ]  defaultKnights;
+        private unsafeClassData[ ] fighterDefaults;
+        private ItemData[ ]                 itemsData;
+        private unsafeSpecialAttackData[ ]  specialAttacks;
+        private unsafeSpellData[ ]          spells;
+        private SkillData[ ]                skillsData;
         private MemoryAccessor(MemoryMappedFile memoryMappedFile)
         {
             brigandineAsMappedFile = memoryMappedFile;
@@ -79,40 +79,40 @@ namespace Memory_Map_Builder
             // TODO Make ReadWrite when I have added handling for writing back to the file.
             Initialize(thisViewAccessor.SafeMemoryMappedViewHandle, 0, thisViewAccessor.Capacity, FileAccess.Read);
 
-            attackTypes     = new AttackType[MemoryAddresses.AttackType.Length];
-            ReadArray(MemoryAddresses.AttackType.Address, attackTypes, 0, MemoryAddresses.AttackType.Length);
-            //AttackTypes     = attackTypes;
+            attackDatas     = new AttackData[MemoryAddresses.AttackType.Length];
+            ReadArray(MemoryAddresses.AttackType.Address, attackDatas, 0, MemoryAddresses.AttackType.Length);
+            //AttackDatas     = attackDatas;
 
-            castles         = new unsafeCastle[MemoryAddresses.Castle.Length];
+            castles         = new unsafeCastleData[MemoryAddresses.Castle.Length];
             ReadArray(MemoryAddresses.Castle.Address, castles, 0, MemoryAddresses.Castle.Length);
             //castles         = castles;
             
-            defaultKnights  = new unsafeDefaultKnight[MemoryAddresses.DefaultKnight.Length];
+            defaultKnights  = new unsafeDefaultKnightData[MemoryAddresses.DefaultKnight.Length];
             ReadArray(MemoryAddresses.DefaultKnight.Address, defaultKnights, 0, MemoryAddresses.DefaultKnight.Length);
             //defaultKnights  = defaultKnights;
             
-            fighterDefaults = new unsafeFighterDefault[MemoryAddresses.FighterDefault.Length];
+            fighterDefaults = new unsafeClassData[MemoryAddresses.FighterDefault.Length];
             ReadArray(MemoryAddresses.FighterDefault.Address, fighterDefaults, 0,MemoryAddresses.FighterDefault.Length);
             //fighterDefaults = fighterDefaults;
             
-            items           = new Item[MemoryAddresses.Item.Length];
-            ReadArray(MemoryAddresses.Item.Address, items, 0, MemoryAddresses.Item.Length);
-            //items           = items;
+            itemsData           = new ItemData[MemoryAddresses.Item.Length];
+            ReadArray(MemoryAddresses.Item.Address, itemsData, 0, MemoryAddresses.Item.Length);
+            //itemsData           = itemsData;
             
-            specialAttacks  = new unsafeSpecialAttack[MemoryAddresses.SpecialAttack.Length];
+            specialAttacks  = new unsafeSpecialAttackData[MemoryAddresses.SpecialAttack.Length];
             ReadArray(MemoryAddresses.SpecialAttack.Address, specialAttacks, 0, MemoryAddresses.SpecialAttack.Length);
             //specialAttacks  = specialAttacks;
             
-            spells          = new unsafeSpell[MemoryAddresses.Spell.Length];
+            spells          = new unsafeSpellData[MemoryAddresses.Spell.Length];
             ReadArray(MemoryAddresses.Spell.Address, spells, 0, MemoryAddresses.Spell.Length);
             //spells          = spells;
             
-            skills          = new Skill[MemoryAddresses.Skill.Length];
-            ReadArray(MemoryAddresses.Skill.Address, skills, 0, MemoryAddresses.Skill.Length);
-            //skills          = skills;
+            skillsData          = new SkillData[MemoryAddresses.Skill.Length];
+            ReadArray(MemoryAddresses.Skill.Address, skillsData, 0, MemoryAddresses.Skill.Length);
+            //skillsData          = skillsData;
 
-#if DEBUG_MEMORY_STATGROWTH_BROKEN
-            var statGrowth = new ClassStatGrowth[MemoryAddresses.StatGrowth.Length];
+#if WORK_IN_PROGRESS
+            var statGrowth = new StatGrowthData[MemoryAddresses.StatGrowth.Length];
             ReadArray(MemoryAddresses.StatGrowth.Address, statGrowth, 0, MemoryAddresses.StatGrowth.Length);
             StatGrowths = statGrowth;
 #endif
@@ -120,7 +120,10 @@ namespace Memory_Map_Builder
 
 
         /// <summary>
-        /// From the address it reads the string until the first null character (0x00) and returns it.
+        /// If the address is above the VirtualStartAddress if will adjust it using <see cref="AdjustAddress"/> and then
+        /// try to return a string at the given address.<para/>
+        /// If the address is below the VirtualStartAddress it will be treated as a direct reference in the file and get
+        /// the string directly at that spot instead of adjusting it first.
         /// </summary>
         /// <param name="address">Pointer to the start of the string.</param>
         /// <returns>The a string from the bytes found.</returns>
@@ -131,7 +134,8 @@ namespace Memory_Map_Builder
             var list = new List<byte>();
             byte byteRead;
 
-            // Check if the address is above the VirtualStartAddress so we can adjust the address to be used.
+            // If the address is above the VirtualStartAddress adjust it from PS1 Memomry address space to local file
+            // space.
             var adjustedAddress = (address > VirtualStartAddress) ? AdjustAddress(address) : address;
 
             while ((byteRead = ReadByte(adjustedAddress + (uint) list.Count)) != 0x00)
@@ -143,19 +147,19 @@ namespace Memory_Map_Builder
 
 
         #region Public properties for quick access to different types
-        // See the comment above starting above the AttackType[] field for why unsafe types are used for some types.
+        // See the comment starting above the AttackData[] field for why unsafe types are used for some types.
         // TODO Set has been left unfilled so that I implement the set functionality later when writing is finished.
-        public AttackType[]     AttackTypes     { get => attackTypes; private set {} }
-        public unsafeCastle[]         Castles         { get => castles; private set {} }
-        public unsafeDefaultKnight[]  DefaultKnights  { get=> defaultKnights; private set {} }
-        public unsafeFighterDefault[] FighterDefaults { get => fighterDefaults; private set {} }
-        public Item[ ]          Items           { get => items ; private set {} }
-        public unsafeSpecialAttack[]  SpecialAttacks  { get=> specialAttacks; private set {} }
-        public unsafeSpell[]          Spells          { get=> spells; private set {} }
-        public Skill[]          Skills          { get => skills; private set {} }
-#if DEBUG_MEMORY_STATGROWTH_BROKEN
-        private ClassStatGrowth[] statGrowths;
-        public ClassStatGrowth[] StatGrowths { get => statGrowths; private set; }
+        public AttackData[]     AttackDatas     { get => attackDatas; private set {} }
+        public unsafeCastleData[]         Castles         { get => castles; private set {} }
+        public unsafeDefaultKnightData[]  DefaultKnights  { get=> defaultKnights; private set {} }
+        public unsafeClassData[] FighterDefaults { get => fighterDefaults; private set {} }
+        public ItemData[ ]          ItemsData           { get => itemsData ; private set {} }
+        public unsafeSpecialAttackData[]  SpecialAttacks  { get=> specialAttacks; private set {} }
+        public unsafeSpellData[]          Spells          { get=> spells; private set {} }
+        public SkillData[]          SkillsData          { get => skillsData; private set {} }
+#if WORK_IN_PROGRESS
+        private StatGrowthData[] statGrowths;
+        public StatGrowthData[] StatGrowths { get => statGrowths; private set {} }
 #endif
   #endregion
     }

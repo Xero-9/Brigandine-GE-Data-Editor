@@ -5,7 +5,7 @@ using Memory_Map_Builder.Enums;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
-    public struct Castle
+    public struct CastleData
     {
         public uint      Name;
         public byte      MovesFlag;
@@ -15,14 +15,14 @@ namespace Memory_Map_Builder.DataTypes
         public byte      PrefixForCity;
         public OwnerEnum Owner;
         public ushort    ManaPerMonth;
-        public byte      SummonMonster_1;
-        public byte      SummonMonster_2;
-        public byte      SummonMonster_3;
-        public byte      SummonMonster_4;
+        public byte      MonstersThatCanBeSummoned_1;
+        public byte      MonstersThatCanBeSummoned_2;
+        public byte      MonstersThatCanBeSummoned_3;
+        public byte      MonstersThatCanBeSummoned_4;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
-    public unsafe struct unsafeCastle
+    public unsafe struct unsafeCastleData
     {
         public       uint      Name;
         public       byte      MovesFlag;
@@ -32,9 +32,9 @@ namespace Memory_Map_Builder.DataTypes
         public       ushort    ManaPerMonth;
         public fixed byte      MonstersThatCanBeSummoned[0xF]; // or [16]
 
-        public static implicit operator Castle(unsafeCastle castle)
+        public static implicit operator CastleData(unsafeCastleData castle)
         {
-            return *(Castle*) &castle;
+            return *(CastleData*) &castle;
         }
     }
 }

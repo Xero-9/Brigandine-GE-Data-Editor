@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 10)]
-    public struct Monster_In_Summon
+    public struct MonsterInSummonData
     {
         public uint   Name;
         public byte   Level;

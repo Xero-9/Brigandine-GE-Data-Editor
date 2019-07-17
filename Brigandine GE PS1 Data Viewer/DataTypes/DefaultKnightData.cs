@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x28)]
-    public struct DefaultKnight
+    public struct DefaultKnightData
     {
-        public uint   NameAddr;
+        public uint   Name;
         public byte   Class;
         public byte   Level;
         public ushort XP;
@@ -33,7 +33,7 @@ namespace Memory_Map_Builder.DataTypes
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x28)]
-    public unsafe struct unsafeDefaultKnight
+    public unsafe struct unsafeDefaultKnightData
     {
         public       uint   Name;
         public       byte   Class;
@@ -54,9 +54,9 @@ namespace Memory_Map_Builder.DataTypes
         public       byte   Team;
         public       byte   Town;
 
-        public static implicit operator DefaultKnight(unsafeDefaultKnight defaultKnight)
+        public static implicit operator DefaultKnightData(unsafeDefaultKnightData defaultKnight)
         {
-            return *(DefaultKnight*) &defaultKnight;
+            return *(DefaultKnightData*) &defaultKnight;
         }
     }
 }

@@ -5,7 +5,7 @@ using Memory_Map_Builder.Helper_Classes;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-    public struct SpecialAttack
+    public struct SpecialAttackData
     {
         public uint    Name;
         public uint    Description;
@@ -23,7 +23,7 @@ namespace Memory_Map_Builder.DataTypes
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-    public unsafe struct unsafeSpecialAttack
+    public unsafe struct unsafeSpecialAttackData
     {
         public       uint    Name;
         public       uint    Description;
@@ -35,9 +35,9 @@ namespace Memory_Map_Builder.DataTypes
         public       byte    GroundOrSky;
         public fixed byte    Unknown[5];
 
-        public static implicit operator SpecialAttack(unsafeSpecialAttack specialAttack)
+        public static implicit operator SpecialAttackData(unsafeSpecialAttackData specialAttack)
         {
-            return *(SpecialAttack*) &specialAttack;
+            return *(SpecialAttackData*) &specialAttack;
         }
     }
 }

@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Ignore SLPS_026 resource don't want to get sued for copyright violations.
+SLPS_026
+
 # User-specific files
 *.rsuser
 *.suo
@@ -338,3 +341,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/Brigandine GE PS1 Data Viewer Tests/SLPS_026

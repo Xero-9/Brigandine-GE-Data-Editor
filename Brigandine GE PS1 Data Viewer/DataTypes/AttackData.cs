@@ -5,7 +5,7 @@ using Memory_Map_Builder.Helper_Classes;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-    public struct AttackType
+    public struct AttackData
     {
         public uint    Name;
         public uint    Description;

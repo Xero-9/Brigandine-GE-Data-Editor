@@ -8,7 +8,7 @@ using Memory_Map_Builder.Helper_Classes;
 namespace Memory_Map_Builder.DataTypes
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x30)]
-    public struct FighterDefault
+    public struct ClassData
     {
         public uint           Name;
         public byte           Move;
@@ -39,7 +39,7 @@ namespace Memory_Map_Builder.DataTypes
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x30)]
-    public unsafe struct unsafeFighterDefault
+    public unsafe struct unsafeClassData
     {
         public uint     Name;
         public byte     Move;
@@ -59,9 +59,9 @@ namespace Memory_Map_Builder.DataTypes
         //I think this may be sprite, animations and/or object references.
         public fixed uint Unkown[5];
 
-        public static implicit operator FighterDefault(unsafeFighterDefault fighterDefault)
+        public static implicit operator ClassData(unsafeClassData @class)
         {
-            return *(FighterDefault*) &fighterDefault;
+            return *(ClassData*) &@class;
         }
     }
 }
