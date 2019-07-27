@@ -4,6 +4,7 @@ using Memory_Map_Builder.Helper_Classes;
 
 namespace Memory_Map_Builder.DataTypes
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public struct SpecialAttackData
     {
@@ -21,7 +22,7 @@ namespace Memory_Map_Builder.DataTypes
         public byte    Unk5;
         public byte    Unk6;
     }
-
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public unsafe struct unsafeSpecialAttackData
     {

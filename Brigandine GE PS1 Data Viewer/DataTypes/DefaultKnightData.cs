@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Memory_Map_Builder.DataTypes
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x28)]
     public struct DefaultKnightData
     {
@@ -31,7 +32,7 @@ namespace Memory_Map_Builder.DataTypes
         public byte   Team;
         public byte   Town;
     }
-
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x28)]
     public unsafe struct unsafeDefaultKnightData
     {

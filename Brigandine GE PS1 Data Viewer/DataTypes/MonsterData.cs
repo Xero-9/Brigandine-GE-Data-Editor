@@ -1,7 +1,9 @@
+using System;
 using Memory_Map_Builder.Enums;
 
 namespace Memory_Map_Builder.DataTypes
 {
+    [Serializable]
     public struct MonsterData
     {
         public OwnerEnum Owner;

@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Memory_Map_Builder.Enums;
 
 namespace Memory_Map_Builder.DataTypes
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
     public struct CastleData
     {
@@ -21,6 +23,7 @@ namespace Memory_Map_Builder.DataTypes
         public byte      MonstersThatCanBeSummoned_4;
     }
 
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
     public unsafe struct unsafeCastleData
     {

@@ -7,6 +7,7 @@ using Memory_Map_Builder.Helper_Classes;
 
 namespace Memory_Map_Builder.DataTypes
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x30)]
     public struct ClassData
     {
@@ -37,7 +38,7 @@ namespace Memory_Map_Builder.DataTypes
         public uint           Unknown3;
         public uint           Unknown4;
     }
-
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x30)]
     public unsafe struct unsafeClassData
     {

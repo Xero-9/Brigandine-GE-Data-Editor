@@ -1,7 +1,9 @@
 ﻿//#define WORK_IN_PROGRESS
 using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
@@ -26,8 +28,11 @@ namespace Memory_Map_Builder
     /// TODO 1. Add functionality for loading the MemoryMappedFile from a string.
     /// TODO 2. Add functionality for altering and saving the data back to the file.
     /// </summary>
-    public class MemoryAccessor : UnmanagedMemoryAccessor
+    public class MemoryAccessor
     {
+        private static List<MemoryMappedFile> memoryMappedFilesToBeDisposed = new List<MemoryMappedFile>();
+        public static void DisposeAllMappedFiles() => memoryMappedFilesToBeDisposed.ForEach(m => m.Dispose());
+        
         public const int HeaderA = 0x4790;
         public const int HeaderB = 0xB070;
         public const long VirtualStartAddress = 0x80000000;
@@ -51,10 +56,28 @@ namespace Memory_Map_Builder
         /// </summary>
         /// <param name="memoryMappedFile"></param>
         /// <returns>An instance of the accessor into the mapped file for easy access to the data structs.</returns>
-        public static MemoryAccessor CreateAccessor(MemoryMappedFile memoryMappedFile) =>
-            new MemoryAccessor(memoryMappedFile);
+        public static MemoryAccessor CreateAccessor(MemoryMappedFile memoryMappedFile)
+        {
+            var memoryAccessor = new MemoryAccessor(memoryMappedFile);
+            if (memoryAccessor.IsOpen)
+            {
+                return memoryAccessor;
+            }
+            return null;
+        }
+        private bool IsOpen { get; set; }
+        // TODO Add Documentation.
+        public static MemoryAccessor CreateAccessor(string PathToFile)
+        {
+            using (var fs = File.Open(PathToFile, FileMode.OpenOrCreate))
+            {   
+                return new MemoryAccessor(MemoryMappedFile.CreateFromFile(fs, "SLPS_026", fs.Length,
+                                                                      MemoryMappedFileAccess.CopyOnWrite,
+                                                                      HandleInheritability.None, false));
 
-
+                //return CreateAccessor(MemoryMappedFile.CreateFromFile(PathToFile, FileMode.OpenOrCreate));
+            }
+        }
         // The MemoryMappedFile that this unmanagedMemoryAccessor uses for getting and eventually setting that data.
         private MemoryMappedFile brigandineAsMappedFile;
         // The view accessor that the safe buffer that is used in the Initialize function comes from this view.
@@ -75,40 +98,64 @@ namespace Memory_Map_Builder
         {
             brigandineAsMappedFile = memoryMappedFile;
             thisViewAccessor = brigandineAsMappedFile.CreateViewAccessor();
-            
-            // TODO Make ReadWrite when I have added handling for writing back to the file.
-            Initialize(thisViewAccessor.SafeMemoryMappedViewHandle, 0, thisViewAccessor.Capacity, FileAccess.Read);
 
+            // TODO Find a better way to check its the right file and refactor it to it's own function.
+            var bytesCheck = new byte[ ] { 0x50, 0x53, 0x2D, 0x58, 0x20, 0x45, 0x58, 0x45 };
+            byte[ ] bytes = new byte[8];
+            if (thisViewAccessor.ReadArray(0, bytes, 0, 8) != 8)
+            {
+                brigandineAsMappedFile.Dispose();
+                return;
+                throw new Exception("This file has the wrong header size returning early.");
+            }
+            for (int i = 0; i < bytesCheck.Length; i++)
+            {
+                if(bytes[i] != bytesCheck[i])
+                {
+                    brigandineAsMappedFile.Dispose();
+                    return;
+                    throw new Exception("This file has the wrong header returning early.");
+                } 
+            }
+            memoryMappedFilesToBeDisposed.Add(this.brigandineAsMappedFile);
+            // TODO Make ReadWrite when I have added handling for writing back to the file.
+            //Initialize(thisViewAccessor.SafeMemoryMappedViewHandle, 0, thisViewAccessor.Capacity, FileAccess.Read);
+            IsOpen = true;
+            GetData();
+        }
+
+        private void GetData()
+        {
             attackDatas     = new AttackData[MemoryAddresses.AttackType.Length];
-            ReadArray(MemoryAddresses.AttackType.Address, attackDatas, 0, MemoryAddresses.AttackType.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.AttackType.Address, attackDatas, 0, MemoryAddresses.AttackType.Length);
             //AttackDatas     = attackDatas;
 
             castles         = new unsafeCastleData[MemoryAddresses.Castle.Length];
-            ReadArray(MemoryAddresses.Castle.Address, castles, 0, MemoryAddresses.Castle.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.Castle.Address, castles, 0, MemoryAddresses.Castle.Length);
             //castles         = castles;
             
             defaultKnights  = new unsafeDefaultKnightData[MemoryAddresses.DefaultKnight.Length];
-            ReadArray(MemoryAddresses.DefaultKnight.Address, defaultKnights, 0, MemoryAddresses.DefaultKnight.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.DefaultKnight.Address, defaultKnights, 0, MemoryAddresses.DefaultKnight.Length);
             //defaultKnights  = defaultKnights;
             
             fighterDefaults = new unsafeClassData[MemoryAddresses.FighterDefault.Length];
-            ReadArray(MemoryAddresses.FighterDefault.Address, fighterDefaults, 0,MemoryAddresses.FighterDefault.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.FighterDefault.Address, fighterDefaults, 0,MemoryAddresses.FighterDefault.Length);
             //fighterDefaults = fighterDefaults;
             
             itemsData           = new ItemData[MemoryAddresses.Item.Length];
-            ReadArray(MemoryAddresses.Item.Address, itemsData, 0, MemoryAddresses.Item.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.Item.Address, itemsData, 0, MemoryAddresses.Item.Length);
             //itemsData           = itemsData;
             
             specialAttacks  = new unsafeSpecialAttackData[MemoryAddresses.SpecialAttack.Length];
-            ReadArray(MemoryAddresses.SpecialAttack.Address, specialAttacks, 0, MemoryAddresses.SpecialAttack.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.SpecialAttack.Address, specialAttacks, 0, MemoryAddresses.SpecialAttack.Length);
             //specialAttacks  = specialAttacks;
             
             spells          = new unsafeSpellData[MemoryAddresses.Spell.Length];
-            ReadArray(MemoryAddresses.Spell.Address, spells, 0, MemoryAddresses.Spell.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.Spell.Address, spells, 0, MemoryAddresses.Spell.Length);
             //spells          = spells;
             
             skillsData          = new SkillData[MemoryAddresses.Skill.Length];
-            ReadArray(MemoryAddresses.Skill.Address, skillsData, 0, MemoryAddresses.Skill.Length);
+            thisViewAccessor.ReadArray(MemoryAddresses.Skill.Address, skillsData, 0, MemoryAddresses.Skill.Length);
             //skillsData          = skillsData;
 
 #if WORK_IN_PROGRESS
@@ -117,7 +164,6 @@ namespace Memory_Map_Builder
             StatGrowths = statGrowth;
 #endif
         }
-
 
         /// <summary>
         /// If the address is above the VirtualStartAddress if will adjust it using <see cref="AdjustAddress"/> and then
@@ -138,7 +184,7 @@ namespace Memory_Map_Builder
             // space.
             var adjustedAddress = (address > VirtualStartAddress) ? AdjustAddress(address) : address;
 
-            while ((byteRead = ReadByte(adjustedAddress + (uint) list.Count)) != 0x00)
+            while ((byteRead = thisViewAccessor.ReadByte(adjustedAddress + (uint) list.Count)) != 0x00)
             {
                 list.Add(byteRead);
             }
@@ -149,7 +195,7 @@ namespace Memory_Map_Builder
         #region Public properties for quick access to different types
         // See the comment starting above the AttackData[] field for why unsafe types are used for some types.
         // TODO Set has been left unfilled so that I implement the set functionality later when writing is finished.
-        public AttackData[]     AttackDatas     { get => attackDatas; private set {} }
+        public ref AttackData[]     AttackDatas     { get => ref attackDatas; } //private set {} }
         public unsafeCastleData[]         Castles         { get => castles; private set {} }
         public unsafeDefaultKnightData[]  DefaultKnights  { get=> defaultKnights; private set {} }
         public unsafeClassData[] FighterDefaults { get => fighterDefaults; private set {} }

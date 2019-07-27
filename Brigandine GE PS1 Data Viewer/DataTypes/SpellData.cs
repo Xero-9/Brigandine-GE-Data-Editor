@@ -4,6 +4,7 @@ using Memory_Map_Builder.Helper_Classes;
 
 namespace Memory_Map_Builder.DataTypes
 {
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public struct SpellData
     {
@@ -20,7 +21,7 @@ namespace Memory_Map_Builder.DataTypes
         public byte    Unk3;
         public byte    Unk4;
     }
-
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public unsafe struct unsafeSpellData
     {

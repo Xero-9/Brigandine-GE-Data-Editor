@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Memory_Map_Builder.Helper_Classes
 {
+
+    //TODO Consider changing from enum to a class that has static values for
+    //TODO each element.
     [Flags]
     public enum Element : ushort
     {
@@ -71,5 +74,19 @@ namespace Memory_Map_Builder.Helper_Classes
         public int Green => elements[Element.Green];
 
         public static implicit operator Elements(Dictionary<Element, int> dict) => new Elements(dict);
+
+        public override string ToString()
+        {
+            List<string> elementsList = new List<string>();
+            foreach (var element in elements)
+            {
+                if (element.Value > 0)
+                    elementsList.Add($"{element.Value} {element.Key}");
+            }
+
+            if (elementsList.Count <= 0)
+                return "No Elemental Affinity";
+            return string.Join(" :: ", elementsList);
+        }
     }
 }

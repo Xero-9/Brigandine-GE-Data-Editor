@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Memory_Map_Builder;
 using Memory_Map_Builder.DataTypes;
 using Memory_Map_Builder.Enums;
@@ -15,6 +16,7 @@ namespace Memory_Map_Builder_Tests
     public static class BrigandineMemoryMapBuilder
     {
         public static MemoryMappedFile BrigandineAsMemoryMappedFile { get; private set; }
+        public static Memory<byte> FileBytes;
 
         static BrigandineMemoryMapBuilder()
         {
@@ -25,14 +27,18 @@ namespace Memory_Map_Builder_Tests
         {
             using (var stream = GetResourceStream("SLPS_026"))
             {
-                //var tempFile = Path.GetTempFileName();
                 var memoryMappedFile =
                     MemoryMappedFile.CreateOrOpen("BrigandineDataFile", stream.Length);
-                memoryMappedFile.CreateViewAccessor().WriteArray(0, new byte[stream.Length], 0, (int)stream.Length);
-                var mapStream = memoryMappedFile.CreateViewStream();
-                stream.CopyToAsync(mapStream).ConfigureAwait(true).GetAwaiter().GetResult();
-                mapStream.FlushAsync().ConfigureAwait(true).GetAwaiter().GetResult();
-                mapStream.Dispose();
+                byte[] bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, (int)stream.Length);
+                FileBytes = new Memory<byte>(bytes);
+                
+                using (var va = memoryMappedFile.CreateViewAccessor())
+                {
+                    va.WriteArray(0, bytes, 0, (int) stream.Length);
+                    va.Flush();
+                }
+                
                 BrigandineAsMemoryMappedFile = memoryMappedFile;
             }
         }
@@ -56,7 +62,7 @@ namespace Memory_Map_Builder_Tests
     public class MemoryTests
     {
 
-        public MemoryAccessor MemoryAccessor = MemoryAccessor.CreateAccessor(BrigandineMemoryMapBuilder.BrigandineAsMemoryMappedFile);
+        public MemoryAccessor memoryAccessor = MemoryAccessor.CreateAccessor(BrigandineMemoryMapBuilder.BrigandineAsMemoryMappedFile);
 
         [TestMethod]
         public void AdjustAddressTest()
@@ -72,50 +78,50 @@ namespace Memory_Map_Builder_Tests
         {
             var namePtr =  2147572493;
             var expectedString = "Vampire Lord";
-            Assert.AreEqual(expectedString, MemoryAccessor.DereferenceString(namePtr));
+            Assert.AreEqual(expectedString, memoryAccessor.DereferenceString(namePtr));
         }
         [TestMethod]
         public void ConstructorAndPropertiesInitializeProperlyTest()
         {
-            Assert.AreEqual(MemoryAddresses.AttackType.Length, MemoryAccessor.AttackDatas.Length);
-            Assert.AreEqual(MemoryAddresses.Castle.Length, MemoryAccessor.Castles.Length);
-            Assert.AreEqual(MemoryAddresses.DefaultKnight.Length, MemoryAccessor.DefaultKnights.Length);
-            Assert.AreEqual(MemoryAddresses.FighterDefault.Length, MemoryAccessor.FighterDefaults.Length);
-            Assert.AreEqual(MemoryAddresses.Item.Length, MemoryAccessor.ItemsData.Length);
-            Assert.AreEqual(MemoryAddresses.SpecialAttack.Length, MemoryAccessor.SpecialAttacks.Length);
-            Assert.AreEqual(MemoryAddresses.Spell.Length, MemoryAccessor.Spells.Length);
-            Assert.AreEqual(MemoryAddresses.Skill.Length, MemoryAccessor.SkillsData.Length);
+            Assert.AreEqual(MemoryAddresses.AttackType.Length, memoryAccessor.AttackDatas.Length);
+            Assert.AreEqual(MemoryAddresses.Castle.Length, memoryAccessor.Castles.Length);
+            Assert.AreEqual(MemoryAddresses.DefaultKnight.Length, memoryAccessor.DefaultKnights.Length);
+            Assert.AreEqual(MemoryAddresses.FighterDefault.Length, memoryAccessor.FighterDefaults.Length);
+            Assert.AreEqual(MemoryAddresses.Item.Length, memoryAccessor.ItemsData.Length);
+            Assert.AreEqual(MemoryAddresses.SpecialAttack.Length, memoryAccessor.SpecialAttacks.Length);
+            Assert.AreEqual(MemoryAddresses.Spell.Length, memoryAccessor.Spells.Length);
+            Assert.AreEqual(MemoryAddresses.Skill.Length, memoryAccessor.SkillsData.Length);
 #if DEBUG_MEMORY_STATGROWTH_BROKEN
             Assert.AreEqual(MemoryAddresses.StatGrowths.Length, memoryAccessor.StatGrowths.Length);
             Assert.AreNotEqual(0, MemoryAccessor.StatGrowths.HPGrowth);☺
 #endif
-            Assert.AreEqual("Full Blade", MemoryAccessor.DereferenceString(MemoryAccessor.AttackDatas[0].Name));
-            Assert.AreEqual("Hervery", MemoryAccessor.DereferenceString(MemoryAccessor.Castles[0].Name));
-            Assert.AreEqual(1, MemoryAccessor.DefaultKnights[0].Level);
-            Assert.AreEqual("Fighter", MemoryAccessor.DereferenceString((uint)MemoryAccessor.FighterDefaults[0].Name));
-            Assert.AreEqual("Solomon's Ring", MemoryAccessor.DereferenceString((uint) MemoryAccessor.ItemsData[0].Name));
-            Assert.AreEqual("Howl Fire", MemoryAccessor.DereferenceString((uint) MemoryAccessor.SpecialAttacks[0].Name));
-            Assert.AreEqual("Heal", MemoryAccessor.DereferenceString((uint) MemoryAccessor.Spells[0].Name));
-            Assert.AreEqual("Nimble", MemoryAccessor.DereferenceString((uint)MemoryAccessor.SkillsData[0].Name));
+            Assert.AreEqual("Full Blade", memoryAccessor.DereferenceString(memoryAccessor.AttackDatas[0].Name));
+            Assert.AreEqual("Hervery", memoryAccessor.DereferenceString(memoryAccessor.Castles[0].Name));
+            Assert.AreEqual(1, memoryAccessor.DefaultKnights[0].Level);
+            Assert.AreEqual("Fighter", memoryAccessor.DereferenceString((uint)memoryAccessor.FighterDefaults[0].Name));
+            Assert.AreEqual("Solomon's Ring", memoryAccessor.DereferenceString((uint) memoryAccessor.ItemsData[0].Name));
+            Assert.AreEqual("Howl Fire", memoryAccessor.DereferenceString((uint) memoryAccessor.SpecialAttacks[0].Name));
+            Assert.AreEqual("Heal", memoryAccessor.DereferenceString((uint) memoryAccessor.Spells[0].Name));
+            Assert.AreEqual("Nimble", memoryAccessor.DereferenceString((uint)memoryAccessor.SkillsData[0].Name));
         }
 
         [TestMethod]
         public void CastFromUnsafeStructsTest()
         {
-            CastleData firstCastleData = MemoryAccessor.Castles[0];
-            Assert.AreEqual("Hervery", MemoryAccessor.DereferenceString(firstCastleData.Name));
+            CastleData firstCastleData = memoryAccessor.Castles[0];
+            Assert.AreEqual("Hervery", memoryAccessor.DereferenceString(firstCastleData.Name));
 
-            DefaultKnightData firstDefaultKnight = MemoryAccessor.DefaultKnights[0];
+            DefaultKnightData firstDefaultKnight = memoryAccessor.DefaultKnights[0];
             Assert.AreEqual(1, firstDefaultKnight.Level);
 
-            ClassData firstClassData = MemoryAccessor.FighterDefaults[0];
-            Assert.AreEqual("Fighter", MemoryAccessor.DereferenceString(firstClassData.Name));
+            ClassData classData = memoryAccessor.FighterDefaults[0];
+            Assert.AreEqual("Fighter", memoryAccessor.DereferenceString(classData.Name));
 
-            SpecialAttackData firstSpecialAttackData = MemoryAccessor.SpecialAttacks[0];
-            Assert.AreEqual("Howl Fire", MemoryAccessor.DereferenceString(firstSpecialAttackData.Name));
+            SpecialAttackData firstSpecialAttackData = memoryAccessor.SpecialAttacks[0];
+            Assert.AreEqual("Howl Fire", memoryAccessor.DereferenceString(firstSpecialAttackData.Name));
 
-            SpellData firstSpellData = MemoryAccessor.Spells[0];
-            Assert.AreEqual("Heal", MemoryAccessor.DereferenceString((uint) firstSpellData.Name));
+            SpellData firstSpellData = memoryAccessor.Spells[0];
+            Assert.AreEqual("Heal", memoryAccessor.DereferenceString((uint) firstSpellData.Name));
         }
     }
 }

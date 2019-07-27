@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace Memory_Map_Builder.DataTypes
 {
 #if WORK_IN_PROGRESS
+    [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 5)]
     public struct StatGrowthData
     {
