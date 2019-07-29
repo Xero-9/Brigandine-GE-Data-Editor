@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Memory_Map_Builder.Helper_Classes;
+using Memory_Map_Builder.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Memory_Map_Builder_Tests

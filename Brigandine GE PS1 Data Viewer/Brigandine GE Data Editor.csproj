@@ -17,6 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.3" />
+    <None Remove="SLPS_026" />
   </ItemGroup>
 </Project>

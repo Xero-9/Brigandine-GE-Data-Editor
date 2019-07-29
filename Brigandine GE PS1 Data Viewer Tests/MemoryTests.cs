@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -83,14 +83,14 @@ namespace Memory_Map_Builder_Tests
         [TestMethod]
         public void ConstructorAndPropertiesInitializeProperlyTest()
         {
-            Assert.AreEqual(MemoryAddresses.AttackType.Length, memoryAccessor.AttackDatas.Length);
-            Assert.AreEqual(MemoryAddresses.Castle.Length, memoryAccessor.Castles.Length);
-            Assert.AreEqual(MemoryAddresses.DefaultKnight.Length, memoryAccessor.DefaultKnights.Length);
-            Assert.AreEqual(MemoryAddresses.FighterDefault.Length, memoryAccessor.FighterDefaults.Length);
-            Assert.AreEqual(MemoryAddresses.Item.Length, memoryAccessor.ItemsData.Length);
-            Assert.AreEqual(MemoryAddresses.SpecialAttack.Length, memoryAccessor.SpecialAttacks.Length);
-            Assert.AreEqual(MemoryAddresses.Spell.Length, memoryAccessor.Spells.Length);
-            Assert.AreEqual(MemoryAddresses.Skill.Length, memoryAccessor.SkillsData.Length);
+            Assert.AreEqual(MemoryAddresses.Attacks.Length, memoryAccessor.AttackDatas.Length);
+            Assert.AreEqual(MemoryAddresses.Castles.Length, memoryAccessor.Castles.Length);
+            Assert.AreEqual(MemoryAddresses.DefaultKnights.Length, memoryAccessor.DefaultKnights.Length);
+            Assert.AreEqual(MemoryAddresses.FighterDefaults.Length, memoryAccessor.FighterDefaults.Length);
+            Assert.AreEqual(MemoryAddresses.Items.Length, memoryAccessor.ItemsData.Length);
+            Assert.AreEqual(MemoryAddresses.SpecialAttacks.Length, memoryAccessor.SpecialAttacks.Length);
+            Assert.AreEqual(MemoryAddresses.Spells.Length, memoryAccessor.Spells.Length);
+            Assert.AreEqual(MemoryAddresses.Skills.Length, memoryAccessor.SkillsData.Length);
 #if DEBUG_MEMORY_STATGROWTH_BROKEN
             Assert.AreEqual(MemoryAddresses.StatGrowths.Length, memoryAccessor.StatGrowths.Length);
             Assert.AreNotEqual(0, MemoryAccessor.StatGrowths.HPGrowth);☺

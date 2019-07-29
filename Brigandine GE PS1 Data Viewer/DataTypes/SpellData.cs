@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Memory_Map_Builder.Helper_Classes;
+using Memory_Map_Builder.Enums;
 
 namespace Memory_Map_Builder.DataTypes
 {

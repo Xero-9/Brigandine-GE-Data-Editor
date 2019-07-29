@@ -1,4 +1,4 @@
-﻿namespace Memory_Map_Builder.DataGetter
+﻿namespace Memory_Map_Builder.Enums
 {
     public enum MoveType : byte
     {

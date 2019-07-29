@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Memory_Map_Builder.Helper_Classes
+namespace Memory_Map_Builder.Enums
 {
 
     //TODO Consider changing from enum to a class that has static values for

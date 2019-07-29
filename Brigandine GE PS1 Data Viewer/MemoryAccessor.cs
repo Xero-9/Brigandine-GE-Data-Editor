@@ -14,18 +14,16 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Memory_Map_Builder.DataGetter;
 using Memory_Map_Builder.DataTypes;
-using Memory_Map_Builder.Location;
 using Microsoft.Win32.SafeHandles;
 
 namespace Memory_Map_Builder
 {
     /// <summary>
     /// Class for creating a view into a Brigandine Grand Edition data file that has been opened as a MemoryMappedFile.
-    /// There are also properties and methods for quick access and viewing of the internal data.
-    /// It should be named SLPS_026.61 or SLPS_026.62 for the second disk. <seealso cref="CreateAccessor"/>
-    /// TODO 1. Add functionality for loading the MemoryMappedFile from a string.
+    /// There are properties and methods for quick access and viewing of the internal data.
+    /// The file loaded should be named SLPS_026.61 or SLPS_026.62 for the second disk.
+    /// TODO 1. Improve functionality for loading the MemoryMappedFile from a string.
     /// TODO 2. Add functionality for altering and saving the data back to the file.
     /// </summary>
     public class MemoryAccessor
@@ -73,7 +71,7 @@ namespace Memory_Map_Builder
             {   
                 return new MemoryAccessor(MemoryMappedFile.CreateFromFile(fs, "SLPS_026", fs.Length,
                                                                       MemoryMappedFileAccess.CopyOnWrite,
-                                                                      HandleInheritability.None, false));
+                                                                      HandleInheritability.None, true));
 
                 //return CreateAccessor(MemoryMappedFile.CreateFromFile(PathToFile, FileMode.OpenOrCreate));
             }
@@ -96,7 +94,9 @@ namespace Memory_Map_Builder
         private SkillData[ ]                skillsData;
         private MemoryAccessor(MemoryMappedFile memoryMappedFile)
         {
-            brigandineAsMappedFile = memoryMappedFile;
+            // TODO Fix Access Denied for passed memoryMappedFile.
+            //brigandineAsMappedFile = memoryMappedFile;
+            brigandineAsMappedFile = BrigandineMemoryMapBuilder.BrigandineAsMemoryMappedFile;
             thisViewAccessor = brigandineAsMappedFile.CreateViewAccessor();
 
             // TODO Find a better way to check its the right file and refactor it to it's own function.
@@ -126,36 +126,36 @@ namespace Memory_Map_Builder
 
         private void GetData()
         {
-            attackDatas     = new AttackData[MemoryAddresses.AttackType.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.AttackType.Address, attackDatas, 0, MemoryAddresses.AttackType.Length);
+            attackDatas     = new AttackData[MemoryAddresses.Attacks.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.Attacks.Address, attackDatas, 0, MemoryAddresses.Attacks.Length);
             //AttackDatas     = attackDatas;
 
-            castles         = new unsafeCastleData[MemoryAddresses.Castle.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.Castle.Address, castles, 0, MemoryAddresses.Castle.Length);
+            castles         = new unsafeCastleData[MemoryAddresses.Castles.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.Castles.Address, castles, 0, MemoryAddresses.Castles.Length);
             //castles         = castles;
             
-            defaultKnights  = new unsafeDefaultKnightData[MemoryAddresses.DefaultKnight.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.DefaultKnight.Address, defaultKnights, 0, MemoryAddresses.DefaultKnight.Length);
+            defaultKnights  = new unsafeDefaultKnightData[MemoryAddresses.DefaultKnights.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.DefaultKnights.Address, defaultKnights, 0, MemoryAddresses.DefaultKnights.Length);
             //defaultKnights  = defaultKnights;
             
-            fighterDefaults = new unsafeClassData[MemoryAddresses.FighterDefault.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.FighterDefault.Address, fighterDefaults, 0,MemoryAddresses.FighterDefault.Length);
+            fighterDefaults = new unsafeClassData[MemoryAddresses.FighterDefaults.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.FighterDefaults.Address, fighterDefaults, 0,MemoryAddresses.FighterDefaults.Length);
             //fighterDefaults = fighterDefaults;
             
-            itemsData           = new ItemData[MemoryAddresses.Item.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.Item.Address, itemsData, 0, MemoryAddresses.Item.Length);
+            itemsData           = new ItemData[MemoryAddresses.Items.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.Items.Address, itemsData, 0, MemoryAddresses.Items.Length);
             //itemsData           = itemsData;
             
-            specialAttacks  = new unsafeSpecialAttackData[MemoryAddresses.SpecialAttack.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.SpecialAttack.Address, specialAttacks, 0, MemoryAddresses.SpecialAttack.Length);
+            specialAttacks  = new unsafeSpecialAttackData[MemoryAddresses.SpecialAttacks.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.SpecialAttacks.Address, specialAttacks, 0, MemoryAddresses.SpecialAttacks.Length);
             //specialAttacks  = specialAttacks;
             
-            spells          = new unsafeSpellData[MemoryAddresses.Spell.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.Spell.Address, spells, 0, MemoryAddresses.Spell.Length);
+            spells          = new unsafeSpellData[MemoryAddresses.Spells.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.Spells.Address, spells, 0, MemoryAddresses.Spells.Length);
             //spells          = spells;
             
-            skillsData          = new SkillData[MemoryAddresses.Skill.Length];
-            thisViewAccessor.ReadArray(MemoryAddresses.Skill.Address, skillsData, 0, MemoryAddresses.Skill.Length);
+            skillsData          = new SkillData[MemoryAddresses.Skills.Length];
+            thisViewAccessor.ReadArray(MemoryAddresses.Skills.Address, skillsData, 0, MemoryAddresses.Skills.Length);
             //skillsData          = skillsData;
 
 #if WORK_IN_PROGRESS
