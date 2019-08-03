@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Brigandine GE Data Editor", "Brigandine GE PS1 Data Viewer\Brigandine GE Data Editor.csproj", "{B1A91701-D863-477A-97E4-48EA456299C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Brigandine GE Data Editor", "Brigandine GE Data Editor\Brigandine GE Data Editor.csproj", "{B1A91701-D863-477A-97E4-48EA456299C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brigandine GE Data Editor Tests", "Brigandine GE PS1 Data Viewer Tests\Brigandine GE Data Editor Tests.csproj", "{D70B9346-24E2-4883-9AE1-3D0DAD46D8D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brigandine GE Data Editor Tests", "Brigandine GE Data Editor Tests\Brigandine GE Data Editor Tests.csproj", "{D70B9346-24E2-4883-9AE1-3D0DAD46D8D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9F87ECB0-5ABC-4EBE-B2A3-E61FEF14AF4D}"
 	ProjectSection(SolutionItems) = preProject
