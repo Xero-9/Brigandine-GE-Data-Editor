@@ -8,8 +8,8 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public struct SpellData
     {
-        public uint    Name;
-        public uint    Description;
+        public TextData    Name;
+        public TextData    Description;
         public ushort  MPCost;
         public byte    Range; 
         public byte    Damage;
@@ -17,28 +17,17 @@ namespace BrigandineGEDataEditor.DataTypes
         public byte    GRandSK;
         public byte    Unk1; 
         public byte    AOE; // Most Likely Not AoE
-        public byte    Unk2; 
-        public byte    Unk3; 
-        public byte    Unk4; 
-    }
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
-    public unsafe struct unsafeSpellData
-    {
-        public       uint    Name;
-        public       uint    Description;
-        public       ushort  MPCost; 
-        public       byte    Range; 
-        public       byte    Damage;
-        public       Element Element; 
-        public       byte    GroundAndSky; 
-        public       byte    Unknown1; 
-        public       byte    AOE; // Most Likely Not AoE
-        public fixed byte    Unknown[3];
-        public static implicit operator SpellData(unsafeSpellData spell)
-        {
+        public Unknown Unknowns;
 
-            return *(SpellData*) &spell;
+        public unsafe struct Unknown
+        {
+            public fixed byte unknown[3];
+
+            public byte this[int index]
+            {
+                get => unknown[index];
+                set => unknown[index] = value;
+            }
         }
     }
 }

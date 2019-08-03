@@ -74,13 +74,13 @@ namespace BrigandineGEDataEditor
         // which may be needed for future functions related to data checking and writing,
         // and will likely become internal at a later time.
         private AttackData[]            attackDatas;
-        private unsafeCastleData[ ]         castles;
-        private unsafeDefaultKnightData[ ]  defaultKnights;
-        private unsafeClassData[ ] fighterDefaults;
+        private CastleData[ ]         castles;
+        private DefaultKnightData[ ]  defaultKnights;
+        private ClassData[ ] fighterDefaults;
         private ItemData[ ]                 itemsDatas;
         private MonsterInSummonData[ ] monsterInSummonDatas;
-        private unsafeSpecialAttackData[ ]  specialAttacks;
-        private unsafeSpellData[ ]          spells;
+        private SpecialAttackData[ ]  specialAttacks;
+        private SpellData[ ]          spells;
         private SkillData[ ]                skillsData;
         private MemoryAccessor(MemoryMappedFile memoryMappedFile = null)
         {
@@ -120,15 +120,15 @@ namespace BrigandineGEDataEditor
             thisViewAccessor.ReadArray(MemoryAddresses.Attacks.Address, attackDatas, 0, MemoryAddresses.Attacks.Length);
             //AttackDatas     = attackDatas;
 
-            castles         = new unsafeCastleData[MemoryAddresses.Castles.Length];
+            castles         = new CastleData[MemoryAddresses.Castles.Length];
             thisViewAccessor.ReadArray(MemoryAddresses.Castles.Address, castles, 0, MemoryAddresses.Castles.Length);
             //castles         = castles;
             
-            defaultKnights  = new unsafeDefaultKnightData[MemoryAddresses.DefaultKnights.Length];
+            defaultKnights  = new DefaultKnightData[MemoryAddresses.DefaultKnights.Length];
             thisViewAccessor.ReadArray(MemoryAddresses.DefaultKnights.Address, defaultKnights, 0, MemoryAddresses.DefaultKnights.Length);
             //defaultKnights  = defaultKnights;
             
-            fighterDefaults = new unsafeClassData[MemoryAddresses.FighterDefaults.Length];
+            fighterDefaults = new ClassData[MemoryAddresses.FighterDefaults.Length];
             thisViewAccessor.ReadArray(MemoryAddresses.FighterDefaults.Address, fighterDefaults, 0,MemoryAddresses.FighterDefaults.Length);
             //fighterDefaults = fighterDefaults;
             
@@ -140,11 +140,11 @@ namespace BrigandineGEDataEditor
             thisViewAccessor.ReadArray(MemoryAddresses.MonsterInSummon.Address, monsterInSummonDatas, 0, MemoryAddresses.MonsterInSummon.Length);
             //monsterInSummonDatas           = itemsData;
 
-            specialAttacks  = new unsafeSpecialAttackData[MemoryAddresses.SpecialAttacks.Length];
+            specialAttacks  = new SpecialAttackData[MemoryAddresses.SpecialAttacks.Length];
             thisViewAccessor.ReadArray(MemoryAddresses.SpecialAttacks.Address, specialAttacks, 0, MemoryAddresses.SpecialAttacks.Length);
             //specialAttacks  = specialAttacks;
             
-            spells          = new unsafeSpellData[MemoryAddresses.Spells.Length];
+            spells          = new SpellData[MemoryAddresses.Spells.Length];
             thisViewAccessor.ReadArray(MemoryAddresses.Spells.Address, spells, 0, MemoryAddresses.Spells.Length);
             //spells          = spells;
             
@@ -190,13 +190,13 @@ namespace BrigandineGEDataEditor
         // See the comment starting above the AttackData[] field for why unsafe types are used for some types.
         // TODO Set has been left unfilled so that I implement the set functionality later when writing is finished.
         public ref AttackData[]     AttackDatas     { get => ref attackDatas; } //private set {} }
-        public unsafeCastleData[]         Castles         { get => castles; private set {} }
-        public unsafeDefaultKnightData[]  DefaultKnights  { get=> defaultKnights; private set {} }
-        public unsafeClassData[] FighterDefaults { get => fighterDefaults; private set {} }
+        public CastleData[]         Castles         { get => castles; private set {} }
+        public DefaultKnightData[]  DefaultKnights  { get=> defaultKnights; private set {} }
+        public ClassData[] FighterDefaults { get => fighterDefaults; private set {} }
         public ItemData[ ]          ItemsDatas           { get => itemsDatas ; private set {} }
         public MonsterInSummonData[ ] MonsterInSummonDatas { get => monsterInSummonDatas ; private set {} }
-        public unsafeSpecialAttackData[]  SpecialAttacks  { get=> specialAttacks; private set {} }
-        public unsafeSpellData[]          Spells          { get=> spells; private set {} }
+        public SpecialAttackData[]  SpecialAttacks  { get=> specialAttacks; private set {} }
+        public SpellData[]          Spells          { get=> spells; private set {} }
         public SkillData[]          SkillsData          { get => skillsData; private set {} }
 #if WORK_IN_PROGRESS
         private StatGrowthData[] statGrowths;

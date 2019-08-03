@@ -73,5 +73,31 @@ namespace Memory_Map_Builder_Tests
             SpellData firstSpellData = memoryAccessor.Spells[0];
             Assert.AreEqual("Heal", memoryAccessor.DereferenceString((uint) firstSpellData.Name));
         }
+
+        [TestMethod]
+        public void TextDataGetTextTest()
+        {
+            var castle = memoryAccessor.Castles[0];
+            var text = castle.Name;
+            Assert.AreEqual("Hervery", text.GetText(memoryAccessor));
+        }
+        
+        [TestMethod]
+        public void TextDataSetTextTest()
+        {
+            var castle = memoryAccessor.Castles[0];
+            var text = castle.Name;
+            Assert.AreEqual("Hervery", text.GetText(memoryAccessor));
+            
+            var equalLengthString = "1234567";
+            if(text.SetText(memoryAccessor, ref equalLengthString))
+                Assert.AreEqual("1234567", equalLengthString);
+            var smallerLengthString = "12345";
+            if(text.SetText(memoryAccessor, ref smallerLengthString))
+                Assert.AreEqual("12345", smallerLengthString);
+            var largerLengthString = "123456789";
+            if(!text.SetText(memoryAccessor, ref largerLengthString))
+                Assert.AreNotEqual("1234567", largerLengthString);
+        }
     }
 }

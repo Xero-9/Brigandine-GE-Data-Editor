@@ -17,6 +17,6 @@ namespace BrigandineGEDataEditor.DataTypes
         public byte INT;
         public byte AGI;
         public byte ItemEquipped;
-        public uint Name;
+        public TextData Name;
     }
 }

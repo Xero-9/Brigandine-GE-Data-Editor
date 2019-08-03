@@ -8,7 +8,7 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public struct ItemData
     {
-        public uint           Name;
+        public TextData           Name;
         public ItemTypeEnum   Type;
         public ItemEffectEnum Effect;
         public byte          AttackStr;

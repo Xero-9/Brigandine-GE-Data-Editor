@@ -1,7 +1,7 @@
 ﻿namespace BrigandineGEDataEditor.Enums
 {
     // TODO Convert to hex.
-    public enum Attack : byte
+    public enum AttackEnum : byte
     {
         None              = 0xFF,
         FullBlade         = 0,
