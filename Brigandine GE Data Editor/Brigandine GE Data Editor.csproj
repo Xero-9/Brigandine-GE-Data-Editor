@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Brigandine GE PS1 Data Viewer.csproj.DotSettings" />
     <None Remove="SLPS_026" />
   </ItemGroup>
 </Project>

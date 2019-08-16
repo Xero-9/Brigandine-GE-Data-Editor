@@ -1,4 +1,5 @@
-﻿using BrigandineGEDataEditor.Enums;
+﻿using BrigandineGEDataEditor.DataTypes;
+using BrigandineGEDataEditor.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BrigandineGEDataEditorTests

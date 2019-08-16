@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using BrigandineGEDataEditor.Enums;
 
-namespace BrigandineGEDataEditor.Enums
+namespace BrigandineGEDataEditor.DataTypes
 {
     //TODO Create ElementData struct wih methods below and remove extension methods.
 
