@@ -8,15 +8,15 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public struct SpellData
     {
-        public TextData    Name;
-        public TextData    Description;
-        public ushort  MPCost;
-        public byte    Range; 
-        public byte    Damage;
-        public Element Element;
-        public byte    GRandSK;
-        public byte    Unk1; 
-        public byte    AOE; // Most Likely Not AoE
+        public Text Name;
+        public Text Description;
+        public ushort MPCost;
+        public byte Range;
+        public byte Damage;
+        public ElementEnum Element;
+        public byte GroundAndSky;
+        public byte Unknown1;
+        public byte AOE; // Most Likely Not AoE
         public Unknown Unknowns;
 
         public unsafe struct Unknown
@@ -27,6 +27,17 @@ namespace BrigandineGEDataEditor.DataTypes
             {
                 get => unknown[index];
                 set => unknown[index] = value;
+            }
+
+            public byte[] ToArray()
+            {
+                var dest = new byte[5];
+                for (int i = 0; i < dest.Length; i++)
+                {
+                    dest[i] = unknown[i];
+                }
+
+                return dest;
             }
         }
     }

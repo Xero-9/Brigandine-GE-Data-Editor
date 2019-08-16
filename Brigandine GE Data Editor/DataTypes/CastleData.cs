@@ -8,9 +8,11 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
     public struct CastleData
     {
-        public TextData Name;
-        public byte      MovesFlag;
+        public Text Name;
+        public byte MovesFlag;
+
         public ConnectTo CastlesConnectedTo;
+
         [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x03)]
         public struct ConnectTo
         {
@@ -34,7 +36,8 @@ namespace BrigandineGEDataEditor.DataTypes
                             return Castle1;
                     }
                 }
-                set{
+                set
+                {
                     switch (Math.Min(Math.Max(index, 0), 2))
                     {
                         case 0:
@@ -50,18 +53,32 @@ namespace BrigandineGEDataEditor.DataTypes
                 }
             }
         }
-        public byte      PrefixForCity;
-        public OwnerEnum Owner;
-        public ushort    ManaPerMonth;
+
+        public byte PrefixForCity;
+        public CountryEnum Country;
+        public ushort ManaPerMonth;
         public CanSummon MonsterCanSummon;
+
         [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x0F)]
         public unsafe struct CanSummon
         {
-            private fixed byte monsters[0xF];
+            private fixed byte monsters[0x0F];
+
             public byte this[int index]
             {
                 get => monsters[index];
                 set => monsters[index] = value;
+            }
+
+            public byte[] ToArray()
+            {
+                var dest = new byte[16];
+                for (int i = 0; i < dest.Length; i++)
+                {
+                    dest[i] = monsters[i];
+                }
+
+                return dest;
             }
         }
     }

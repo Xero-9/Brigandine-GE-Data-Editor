@@ -7,7 +7,7 @@ namespace BrigandineGEDataEditor.DataTypes
     [Serializable]
     public struct MonsterData
     {
-        public OwnerEnum Owner;
+        public CountryEnum Country;
         public byte MonsterSlotNumber;
         public byte Class;
         public byte Level;
@@ -17,6 +17,6 @@ namespace BrigandineGEDataEditor.DataTypes
         public byte INT;
         public byte AGI;
         public byte ItemEquipped;
-        public TextData Name;
+        public Text Name;
     }
 }

@@ -8,14 +8,14 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x14)]
     public struct SpecialAttackData
     {
-        public TextData    Name;
-        public TextData    Description;
-        public byte    MP;
-        public byte    Range;
-        public byte    Damage;
-        public byte    Unk1;
-        public Element Element;
-        public byte    GroundOrSky;
+        public Text Name;
+        public Text Description;
+        public byte MP;
+        public byte Range;
+        public byte Damage;
+        public byte Unk1;
+        public ElementEnum Element;
+        public byte GroundOrSky;
         public Unknown Unknowns;
 
         public unsafe struct Unknown
@@ -26,6 +26,17 @@ namespace BrigandineGEDataEditor.DataTypes
             {
                 get => unknown[index];
                 set => unknown[index] = value;
+            }
+
+            public byte[] ToArray()
+            {
+                var dest = new byte[5];
+                for (int i = 0; i < dest.Length; i++)
+                {
+                    dest[i] = unknown[i];
+                }
+
+                return dest;
             }
         }
     }

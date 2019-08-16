@@ -6,6 +6,12 @@
 # Ignore SLPS_026 resource don't want to get sued for copyright violations.
 SLPS_026
 
+# Brigandine Files
+BrigandineMemoryMapBuilder.cs
+/DiskCover.jpg
+/DiskCoverAlt.jpg
+/TitleImage.jpg
+
 # User-specific files
 *.rsuser
 *.suo
@@ -341,7 +347,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-/Brigandine GE PS1 Data Viewer Tests/SLPS_026
-/DiskCover.jpg
-/DiskCoverAlt.jpg
-/TitleImage.jpg
+

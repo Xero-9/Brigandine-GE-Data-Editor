@@ -10,7 +10,7 @@ namespace BrigandineGEDataEditor.DataTypes
     {
         public uint Name;
         public byte Move;
-        public MoveType MoveType;
+        public MoveTypeEnum MoveType;
         public byte Defense;
         public Attack Attacks;
 
@@ -99,22 +99,19 @@ namespace BrigandineGEDataEditor.DataTypes
             }
         }
 
-        public byte MagicWB;
-        public byte MagicBR;
-        public byte MagicRB;
-        public byte MagicG;
+        public MagicEnum Spells;
         public Skill Skills;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x02)]
         public struct Skill
         {
-            public FighterSkill firstSkill;
-            public FighterSkill secondSill;
+            public FighterSkillEnum firstSkill;
+            public FighterSkillEnum secondSill;
 
-            public FighterSkill FirstSkill => firstSkill;
-            public FighterSkill SecondSkill => secondSill;
+            public FighterSkillEnum FirstSkill => firstSkill;
+            public FighterSkillEnum SecondSkill => secondSill;
 
-            public FighterSkill this[int index]
+            public FighterSkillEnum this[int index]
             {
                 get
                 {
@@ -143,7 +140,7 @@ namespace BrigandineGEDataEditor.DataTypes
             }
         }
 
-        public Element Element;
+        public ElementEnum Element;
         public byte Add_HP;
         public byte Add_MP;
         public byte Focus;
@@ -153,6 +150,7 @@ namespace BrigandineGEDataEditor.DataTypes
 
         //I think this may be sprite, animations and/or object references.
         public Unknown Unknowns;
+
         public unsafe struct Unknown
         {
             public fixed uint unknown[5];
@@ -161,6 +159,17 @@ namespace BrigandineGEDataEditor.DataTypes
             {
                 get => unknown[index];
                 set => unknown[index] = value;
+            }
+
+            public uint[] ToArray()
+            {
+                var dest = new uint[5];
+                for (int i = 0; i < dest.Length; i++)
+                {
+                    dest[i] = unknown[i];
+                }
+
+                return dest;
             }
         }
     }

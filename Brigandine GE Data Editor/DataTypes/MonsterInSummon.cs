@@ -7,15 +7,15 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 10)]
     public struct MonsterInSummonData
     {
-        public TextData   Name;
-        public byte   Level;
-        public byte   Exp;
+        public Text Name;
+        public byte Level;
+        public byte Exp;
         public ushort BaseHP;
         public ushort BaseMP;
-        public byte   Str;
-        public byte   Int;
-        public byte   Hit;
-        public byte   RuneCost;
+        public byte Str;
+        public byte Int;
+        public byte Hit;
+        public byte RuneCost;
         public ushort ManaCost;
     }
 }

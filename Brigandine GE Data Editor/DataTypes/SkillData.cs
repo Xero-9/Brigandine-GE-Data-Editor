@@ -7,7 +7,7 @@ namespace BrigandineGEDataEditor.DataTypes
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8)]
     public struct SkillData
     {
-        public TextData Name;        
-        public TextData Description; 
+        public Text Name;
+        public Text Description;
     }
 }
