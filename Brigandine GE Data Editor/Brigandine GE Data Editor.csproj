@@ -23,6 +23,11 @@
 
   <ItemGroup>
     <None Remove="Brigandine GE PS1 Data Viewer.csproj.DotSettings" />
+      <None Remove="DefaultData"/>
     <None Remove="SLPS_026" />
   </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="DefaultData"/>
+    </ItemGroup>
 </Project>

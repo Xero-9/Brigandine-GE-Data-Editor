@@ -7,7 +7,7 @@
 SLPS_026
 
 # Brigandine Files
-BrigandineMemoryMapBuilder.cs
+#BrigandineMemoryMapBuilder.cs
 /DiskCover.jpg
 /DiskCoverAlt.jpg
 /TitleImage.jpg

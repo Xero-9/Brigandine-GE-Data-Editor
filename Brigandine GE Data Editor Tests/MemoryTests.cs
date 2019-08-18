@@ -1,8 +1,3 @@
-using System;
-using System.IO;
-using System.IO.MemoryMappedFiles;
-using System.Linq;
-using System.Reflection;
 using BrigandineGEDataEditor;
 using BrigandineGEDataEditor.DataTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,43 +7,7 @@ namespace BrigandineGEDataEditorTests
     [TestClass]
     public class MemoryTests
     {
-        private static MemoryMappedFile BuildMemoryMapFromResourceFile()
-        {
-            using (var stream = GetResourceStream("SLPS_026"))
-            {
-                var memoryMappedFile =
-                    MemoryMappedFile.CreateOrOpen("BrigandineDataFile", stream.Length);
-                byte[] bytes = new byte[stream.Length];
-                stream.Read(bytes, 0, (int) stream.Length);
-
-                using (var va = memoryMappedFile.CreateViewAccessor())
-                {
-                    va.WriteArray(0, bytes, 0, (int) stream.Length);
-                    va.Flush();
-                }
-
-                return memoryMappedFile;
-            }
-        }
-
-        private static UnmanagedMemoryStream GetResourceStream(String name)
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            string[] resources = assembly.GetManifestResourceNames();
-            string resource =
-                resources.SingleOrDefault(r => r.EndsWith(name, StringComparison.CurrentCultureIgnoreCase));
-
-            if (resource == null)
-            {
-                throw new ArgumentException("The resource does not exist.",
-                    "name");
-            }
-
-            return (UnmanagedMemoryStream) assembly.GetManifestResourceStream(resource);
-        }
-
-        public MemoryAccessor memoryAccessor = MemoryAccessor.CreateAccessor(BuildMemoryMapFromResourceFile());
+        public MemoryAccessor memoryAccessor = MemoryAccessor.CreateAccessor();
 
         [TestMethod]
         public void AdjustAddressTest()

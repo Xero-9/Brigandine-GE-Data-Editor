@@ -56,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <EmbeddedResource Include="SLPS_026" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Brigandine GE Data Editor\Brigandine GE Data Editor.csproj">

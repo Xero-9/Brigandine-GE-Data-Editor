@@ -39,6 +39,13 @@ namespace BrigandineGEDataEditor
         }
 
         /// <summary>
+        /// Creates an instance of the <seealso cref="MemoryAccessor"/> class using the embedded resource DefaultData.
+        /// </summary>
+        /// <returns>An instance of the accessor into the mapped file for easy access to the data structs.</returns>
+        public static MemoryAccessor CreateAccessor() =>
+            CreateAccessor(BrigandineMemoryMapBuilder.BrigandineAsMemoryMappedFile);
+
+        /// <summary>
         /// Creates an instance of the <seealso cref="MemoryAccessor"/> class.
         /// TODO: Create more factory methods to use things like strings and bin files directly.
         /// </summary>

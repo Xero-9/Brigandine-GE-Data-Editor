@@ -9,10 +9,10 @@ officially translated. After more than a decade **HwitVlf** at the
 his own english translation that can be found
 [Here](https://www.swordofmoonlight.com/bbs/index.php?topic=869.0). I
 did change the translation patch slightly by making some names and
-elements closer to their original values. There are plans to include
-this slightly modified version of the translation patch by default. This
-way there is default data and it can be used to patch any SLPS_026
-files.
+elements closer to their original values. Included is this slightly
+modified version of the translation patch which can be used to view the
+data. Only the translation data is in this resource and can not be used
+without a complete SLPS_026 file.
 #### About This Library
 The only dependency this library has is .Net Standard 2.0, this was done
 so anyone can use this library to build GUI tools for editing the SLPS
