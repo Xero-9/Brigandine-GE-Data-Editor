@@ -16,7 +16,7 @@ namespace BrigandineGEDataEditor
     /// TODO 1. Improve functionality for loading the MemoryMappedFile from a string.
     /// TODO 2. Add functionality for altering and saving the data back to the file.
     /// </summary>
-    public class MemoryAccessor
+    public class MemoryAccessor : IDisposable
     {
         private static List<MemoryMappedFile> memoryMappedFilesToBeDisposed = new List<MemoryMappedFile>();
         public static void DisposeAllMappedFiles() => memoryMappedFilesToBeDisposed.ForEach(m => m.Dispose());
@@ -158,16 +158,18 @@ namespace BrigandineGEDataEditor
             if (address == 0)
                 return "Empty";
             var list = new List<byte>();
-            byte byteRead;
 
-            // If the address is above the VirtualStartAddress adjust it from PS1 Memomry address space to local file
+            // If the address is above the VirtualStartAddress adjust it from PS1 Memory address space to local file
             // space.
-            var viewAccessor = MemoryMappedFile.CreateViewAccessor();
-            var adjustedAddress = (address > VirtualStartAddress) ? AdjustAddress(address) : address;
-            if (adjustedAddress > viewAccessor.Capacity) return adjustedAddress.ToString("X");
-            while ((byteRead = viewAccessor.ReadByte(adjustedAddress + (uint) list.Count)) != 0x00)
+            using (var viewAccessor = MemoryMappedFile.CreateViewAccessor())
             {
-                list.Add(byteRead);
+                var adjustedAddress = (address > VirtualStartAddress) ? AdjustAddress(address) : address;
+                if (adjustedAddress > viewAccessor.Capacity) return adjustedAddress.ToString("X");
+                byte byteRead;
+                while ((byteRead = viewAccessor.ReadByte(adjustedAddress + (uint) list.Count)) != 0x00)
+                {
+                    list.Add(byteRead);
+                }
             }
 
             return Encoding.ASCII.GetString(list.ToArray());
@@ -236,5 +238,10 @@ namespace BrigandineGEDataEditor
 #endif
 
         #endregion
+
+        public void Dispose()
+        {
+            MemoryMappedFile?.Dispose();
+        }
     }
 }

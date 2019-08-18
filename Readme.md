@@ -25,6 +25,14 @@ Moonlight forums. The
 get
 [forsena.org from May 2014](https://web.archive.org/web/20140517111817/http://forsena.org/).
 
+#### About SLPS_026
+The SLPS files are a type of Playstation executable which contains most
+of the data for things like names, stats, monsters, etc... The files can
+be found on the Brigandine GE disks, disk 1 has SLPS_026.61 and disk 2
+has SLPS_026.62. While they are both different files they do have areas
+where they are exactly the same and that is the data we are interested
+in.
+
 #### Memory Accessor Class
 This class encapsulates all the functionality for reading and writing (not finished yet) to the SLPS_026.61 and SLPS_026.62 file. The SLPS_062
 files can be found on the original BGE disks or on images of
@@ -38,13 +46,6 @@ arrays for the structs are fragmented. Instead if the file containing
 the data is extracted before using it then the arrays line up perfectly
 to make reading and writing easier.
 
-#### About SLPS_026
-The SLPS files are a type of Playstation executable which contains most
-of the data for things like names, stats, monsters, etc... The files can
-be found on the Brigandine GE disks, disk 1 has SLPS_026.61 and disk 2
-has SLPS_026.62. While they are both different files they do have areas
-where they are exactly the same and that is the data we are interested
-in.
 #### Data Types
 Currently there are 8 supported data types and 3 that are a work in
 progress. Some of the data types do have nested types as well. All of
