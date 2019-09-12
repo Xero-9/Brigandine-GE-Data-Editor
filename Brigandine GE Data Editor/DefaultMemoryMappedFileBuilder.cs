@@ -6,16 +6,13 @@ using System.Reflection;
 
 namespace BrigandineGEDataEditor
 {
-    public static class BrigandineMemoryMapBuilder
+    internal static class DefaultMemoryMappedFileBuilder
     {
-        public static MemoryMappedFile BrigandineAsMemoryMappedFile { get; private set; }
-
-        static BrigandineMemoryMapBuilder()
-        {
-            BuildMemoryMapFromResourceFile();
-        }
-
-        private static void BuildMemoryMapFromResourceFile()
+        /// <summary>
+        /// Builds a MemoryMappedFile for the DefaultData resource.
+        /// </summary>
+        /// <returns>A MemoryMappedFile for the DefaultData resource.</returns>
+        public static MemoryMappedFile BuildMemoryMapFromResourceFile()
         {
             using (var stream = GetResourceStream("DefaultData"))
             {
@@ -30,7 +27,7 @@ namespace BrigandineGEDataEditor
                     va.Flush();
                 }
 
-                BrigandineAsMemoryMappedFile = memoryMappedFile;
+                return memoryMappedFile;
             }
         }
 

@@ -6,7 +6,7 @@ namespace BrigandineGEDataEditor.DataTypes
 {
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x30)]
-    public unsafe struct ClassData
+    public struct ClassData
     {
         public uint Name;
         public byte Move;
@@ -153,7 +153,9 @@ namespace BrigandineGEDataEditor.DataTypes
 
         public unsafe struct Unknown
         {
-            public fixed uint unknown[5];
+#pragma warning disable 649
+            private fixed uint unknown[5];
+#pragma warning restore 649
 
             public uint this[int index]
             {

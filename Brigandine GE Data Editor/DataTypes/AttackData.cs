@@ -22,7 +22,9 @@ namespace BrigandineGEDataEditor.DataTypes
 
         public unsafe struct Unknown
         {
-            public fixed byte unknown[3];
+#pragma warning disable 649
+            private fixed byte unknown[3];
+#pragma warning restore 649
 
             public byte this[int index]
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using BrigandineGEDataEditor.Enums;
+#pragma warning disable 649
 
 namespace BrigandineGEDataEditor.DataTypes
 {
@@ -22,7 +23,7 @@ namespace BrigandineGEDataEditor.DataTypes
 
         public unsafe struct Monster
         {
-            public fixed byte monsters[6];
+            private fixed byte monsters[6];
 
             public byte this[int index]
             {
@@ -46,7 +47,7 @@ namespace BrigandineGEDataEditor.DataTypes
 
         public unsafe struct Unknown
         {
-            public fixed byte unknown[4];
+            private fixed byte unknown[4];
 
             public byte this[int index]
             {

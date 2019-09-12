@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using BrigandineGEDataEditor.DataTypes;
 
 namespace BrigandineGEDataEditor
@@ -13,18 +15,17 @@ namespace BrigandineGEDataEditor
     /// Class for creating a view into a Brigandine Grand Edition data file that has been opened as a MemoryMappedFile.
     /// There are properties and methods for quick access and viewing of the internal data.
     /// The file loaded should be named SLPS_026.61 or SLPS_026.62 for the second disk.
-    /// TODO 1. Improve functionality for loading the MemoryMappedFile from a string.
-    /// TODO 2. Add functionality for altering and saving the data back to the file.
     /// </summary>
     public class MemoryAccessor : IDisposable
     {
-        private static List<MemoryMappedFile> memoryMappedFilesToBeDisposed = new List<MemoryMappedFile>();
-        public static void DisposeAllMappedFiles() => memoryMappedFilesToBeDisposed.ForEach(m => m.Dispose());
+        private static readonly List<MemoryMappedFile> MemoryMappedFilesToBeDisposed = new List<MemoryMappedFile>();
+        public static void DisposeAllMappedFiles() => MemoryMappedFilesToBeDisposed.ForEach(m => m.Dispose());
 
+        public const long FileSize = 0x97000;
         public const int HeaderA = 0x4790;
         public const int HeaderB = 0xB070;
         public const long VirtualStartAddress = 0x80000000;
-
+        
         /// <summary>
         /// Adjust the address from being a playstation memory location to it's file equivalent. This just
         /// means that I subtracted HeaderMinor, HeaderMajor and the VirtualStartAddress values from the address provided.
@@ -33,82 +34,82 @@ namespace BrigandineGEDataEditor
         /// <returns></returns>
         public static long AdjustAddress(long address)
         {
-            var adjustedAddress = (long) address - VirtualStartAddress;
+            var adjustedAddress = address - VirtualStartAddress;
             adjustedAddress -= (HeaderB + HeaderA);
             return adjustedAddress;
         }
 
         /// <summary>
-        /// Creates an instance of the <seealso cref="MemoryAccessor"/> class using the embedded resource DefaultData.
+        /// Creates an instance of the <seealso cref="MemoryAccessor"/> class using the default english patch data.
         /// </summary>
         /// <returns>An instance of the accessor into the mapped file for easy access to the data structs.</returns>
-        public static MemoryAccessor CreateAccessor() =>
-            CreateAccessor(BrigandineMemoryMapBuilder.BrigandineAsMemoryMappedFile);
+        public static MemoryAccessor CreateAccessor() => CreateAccessor(DefaultMemoryMappedFileBuilder.BuildMemoryMapFromResourceFile(), true);
 
         /// <summary>
         /// Creates an instance of the <seealso cref="MemoryAccessor"/> class.
-        /// TODO: Create more factory methods to use things like strings and bin files directly.
+        /// TODO: Create more factory methods to use disk image files directly.
         /// </summary>
-        /// <param name="memoryMappedFile"></param>
+        /// <param name="memoryMappedFile">The MemoryMappedFile to get data from.</param>
+        /// <param name="usingDefaultData">(Optional) Set to true if you are using the default data.</param>
         /// <returns>An instance of the accessor into the mapped file for easy access to the data structs.</returns>
-        public static MemoryAccessor CreateAccessor(MemoryMappedFile memoryMappedFile)
+        public static MemoryAccessor CreateAccessor(MemoryMappedFile memoryMappedFile, bool usingDefaultData = false)
         {
-            var memoryAccessor = new MemoryAccessor(memoryMappedFile);
-            if (memoryAccessor.IsOpen)
+            MemoryAccessor memoryAccessor;
+            try
+            {
+                memoryAccessor = new MemoryAccessor(memoryMappedFile, usingDefaultData);
+            }
+            catch (Exception)
+            {
+                memoryAccessor = null;
+            }
+            if (memoryAccessor != null && memoryAccessor.IsOpen)
             {
                 return memoryAccessor;
             }
-
-            return null;
+            memoryAccessor?.Dispose();
+            return memoryAccessor;
         }
 
         /// <summary>
         /// Creates an instance of the <seealso cref="MemoryAccessor"/> class.
         /// </summary>
-        /// <param name="PathToFile">Path to the SLPS_026 file to read or write.</param>
+        /// <param name="pathToFile">Path to the SLPS_026 file to read or write.</param>
         /// <returns>An instance of the accessor into the mapped file for easy access to the data structs.</returns>
-        public static MemoryAccessor CreateAccessor(string PathToFile) =>
-            CreateAccessor(MemoryMappedFile.CreateFromFile(PathToFile, FileMode.OpenOrCreate));
+        public static MemoryAccessor CreateAccessor(string pathToFile) =>
+            CreateAccessor(MemoryMappedFile.CreateFromFile(pathToFile, FileMode.OpenOrCreate));
 
-        private bool IsOpen { get; set; }
-        public MemoryMappedFile MemoryMappedFile { get; private set; }
+        /// <summary>
+        /// True if the MemoryAccessor is open and ready for editing.
+        /// </summary>
+        public bool IsOpen { get; private set; }
+        private MemoryMappedFile MemoryMappedFile { get; set; }
 
-        private AttackData[] attacks;
-        private CastleData[] castles;
-        private DefaultKnightData[] defaultKnights;
-        private ClassData[] classes;
-        private ItemData[] items;
-        private MonsterInSummonData[] monstersInSummon;
-        private SpecialAttackData[] specialAttacks;
-        private SpellData[] spells;
-        private SkillData[] skills;
-        private StatGrowthData[] statGrowths;
-
-        private MemoryAccessor(MemoryMappedFile memoryMappedFile = null)
+        /// <summary>
+        /// Returns if this MemoryAccessor is using the internal default data.
+        /// </summary>
+        public bool UsingDefaultData { get; private set; }
+        private MemoryAccessor(MemoryMappedFile memoryMappedFile, bool usingDefaultData = false)
         {
+            UsingDefaultData = usingDefaultData;
             MemoryMappedFile = memoryMappedFile;
             using (var viewAccessor = MemoryMappedFile?.CreateViewAccessor())
             {
                 var bytesCheck = new byte[] {0x50, 0x53, 0x2D, 0x58, 0x20, 0x45, 0x58, 0x45};
                 byte[] bytes = new byte[8];
-                if (viewAccessor.ReadArray(0, bytes, 0, 8) != 8)
+                if (viewAccessor?.ReadArray(0, bytes, 0, 8) != 8)
                 {
-                    MemoryMappedFile.Dispose();
-                    return;
+                    MemoryMappedFile?.Dispose();
                     throw new Exception("This file has the wrong header size returning early.");
                 }
 
-                for (int i = 0; i < bytesCheck.Length; i++)
+                if (bytesCheck.Where((t, i) => bytes[i] != t).Any())
                 {
-                    if (bytes[i] != bytesCheck[i])
-                    {
-                        MemoryMappedFile.Dispose();
-                        return;
-                        throw new Exception("This file has the wrong header returning early.");
-                    }
+                    MemoryMappedFile?.Dispose();
+                    throw new Exception("This file has the wrong header returning early.");
                 }
 
-                memoryMappedFilesToBeDisposed.Add(MemoryMappedFile);
+                MemoryMappedFilesToBeDisposed.Add(MemoryMappedFile);
                 IsOpen = true;
                 GetData(viewAccessor);
             }
@@ -116,38 +117,37 @@ namespace BrigandineGEDataEditor
 
         private void GetData(MemoryMappedViewAccessor viewAccessor)
         {
-            attacks = new AttackData[MemoryAddresses.Attacks.Length];
-            viewAccessor.ReadArray(MemoryAddresses.Attacks.Address, attacks, 0, MemoryAddresses.Attacks.Length);
+            Attacks = new AttackData[MemoryAddresses.Attacks.Length];
+            viewAccessor.ReadArray(MemoryAddresses.Attacks.Address, Attacks, 0, MemoryAddresses.Attacks.Length);
 
-            castles = new CastleData[MemoryAddresses.Castles.Length];
-            viewAccessor.ReadArray(MemoryAddresses.Castles.Address, castles, 0, MemoryAddresses.Castles.Length);
+            Castles = new CastleData[MemoryAddresses.Castles.Length];
+            viewAccessor.ReadArray(MemoryAddresses.Castles.Address, Castles, 0, MemoryAddresses.Castles.Length);
 
-            defaultKnights = new DefaultKnightData[MemoryAddresses.DefaultKnights.Length];
-            viewAccessor.ReadArray(MemoryAddresses.DefaultKnights.Address, defaultKnights, 0,
-                MemoryAddresses.DefaultKnights.Length);
+            DefaultKnights = new DefaultKnightData[MemoryAddresses.DefaultKnights.Length];
+            viewAccessor.ReadArray(MemoryAddresses.DefaultKnights.Address, DefaultKnights, 0, MemoryAddresses.DefaultKnights.Length);
 
-            classes = new ClassData[MemoryAddresses.Classes.Length];
-            viewAccessor.ReadArray(MemoryAddresses.Classes.Address, classes, 0, MemoryAddresses.Classes.Length);
+            Classes = new ClassData[MemoryAddresses.Classes.Length];
+            viewAccessor.ReadArray(MemoryAddresses.Classes.Address, Classes, 0, MemoryAddresses.Classes.Length);
 
-            items = new ItemData[MemoryAddresses.Items.Length];
-            viewAccessor.ReadArray(MemoryAddresses.Items.Address, items, 0, MemoryAddresses.Items.Length);
+            Items = new ItemData[MemoryAddresses.Items.Length];
+            viewAccessor.ReadArray(MemoryAddresses.Items.Address, Items, 0, MemoryAddresses.Items.Length);
+
+            SpecialAttacks = new SpecialAttackData[MemoryAddresses.SpecialAttacks.Length];
+            viewAccessor.ReadArray(MemoryAddresses.SpecialAttacks.Address, SpecialAttacks, 0, MemoryAddresses.SpecialAttacks.Length);
+
+            Spells = new SpellData[MemoryAddresses.Spells.Length];
+            viewAccessor.ReadArray(MemoryAddresses.Spells.Address, Spells, 0, MemoryAddresses.Spells.Length);
+
+            Skills = new SkillData[MemoryAddresses.Skills.Length];
+            viewAccessor.ReadArray(MemoryAddresses.Skills.Address, Skills, 0, MemoryAddresses.Skills.Length);
+
+#if WORK_IN_PROGRESS
 
             monstersInSummon = new MonsterInSummonData[MemoryAddresses.MonstersInSummon.Length];
             viewAccessor.ReadArray(MemoryAddresses.MonstersInSummon.Address, monstersInSummon, 0,
                 MemoryAddresses.MonstersInSummon.Length);
 
-            specialAttacks = new SpecialAttackData[MemoryAddresses.SpecialAttacks.Length];
-            viewAccessor.ReadArray(MemoryAddresses.SpecialAttacks.Address, specialAttacks, 0,
-                MemoryAddresses.SpecialAttacks.Length);
-
-            spells = new SpellData[MemoryAddresses.Spells.Length];
-            viewAccessor.ReadArray(MemoryAddresses.Spells.Address, spells, 0, MemoryAddresses.Spells.Length);
-
-            skills = new SkillData[MemoryAddresses.Skills.Length];
-            viewAccessor.ReadArray(MemoryAddresses.Skills.Address, skills, 0, MemoryAddresses.Skills.Length);
-
-#if WORK_IN_PROGRESS
-            var statGrowth = new StatGrowthData[MemoryAddresses.StatGrowth.Length];
+            statGrowth = new StatGrowthData[MemoryAddresses.StatGrowth.Length];
             thisViewAccessor.ReadArray(MemoryAddresses.StatGrowth.Address, statGrowth, 0, MemoryAddresses.StatGrowth.Length);
 #endif
         }
@@ -181,74 +181,75 @@ namespace BrigandineGEDataEditor
 
             return Encoding.ASCII.GetString(list.ToArray());
         }
+        
+        /// <summary>
+        /// Saves all data back to the MemoryMappedFile used to create this instance.
+        /// TODO Add better file handling when saving
+        /// </summary>
+        public void SaveAllDataTypesIntoMemoryMappedFile(FileStream fileStream = null)
+        {
+            if (fileStream != null)
+            {
+                if (fileStream.Length != FileSize || !Regex.IsMatch(fileStream.Name, ".61|.62"))
+                {
+                    throw new
+                        Exception($"{fileStream.Name} Size: {fileStream.Length} is not a valid file to save to please choose one that is the proper size and has the extension .61 or .62.");
+                }
+                var newMemoryMappedFile = MemoryMappedFile.CreateFromFile(fileStream, fileStream.Name, fileStream.Length, MemoryMappedFileAccess.ReadWriteExecute, HandleInheritability.None, false);
+                MemoryMappedFilesToBeDisposed.Remove(MemoryMappedFile);
+                MemoryMappedFile.Dispose();
+                MemoryMappedFile = newMemoryMappedFile;
+            }
+            
+            using(var accessor = MemoryMappedFile.CreateViewAccessor())
+            {
+                
+                accessor.WriteArray(new AttackData().GetAddress(0), Attacks, 0, Attacks.Length);
+                accessor.WriteArray(new CastleData().GetAddress(0), Castles, 0, Castles.Length);
+                accessor.WriteArray(new ClassData ().GetAddress(0), Classes, 0, Castles.Length);
+                accessor.WriteArray(new DefaultKnightData().GetAddress(0), DefaultKnights, 0, DefaultKnights.Length);
+                accessor.WriteArray(new ItemData().GetAddress(0), Items, 0, Items.Length);
+                accessor.WriteArray(new SkillData().GetAddress(0), Skills, 0, Skills.Length);
+                accessor.WriteArray(new SpellData().GetAddress(0), Spells, 0, Spells.Length);
+                accessor.WriteArray(new SpecialAttackData().GetAddress(0), SpecialAttacks, 0, SpecialAttacks.Length);
 
+                // Work In Progress
+                #if Work_In_Progress
+                        accessor.WriteArray(new MonsterInSummonData().GetAddress(0), MonstersInSummon, 0, MonstersInSummon.Length);
+                        accessor.WriteArray(new MonsterData().GetAddress(0), memoryAccessor.Monsters, 0, memoryAccessor.Attacks.Length);
+                        accessor.WriteArray(new StatGrowthData().GetAddress(0), memoryAccessor.StatGrowths, 0, memoryAccessor.Attacks.Length);
+                #endif
+            }
+
+        }
 
         #region Public properties for quick access to different types
 
         // See the comment starting above the AttackData[] field for why unsafe types are used for some types.
-        // TODO Set has been left unfilled so that I implement the set functionality later when writing is finished.
-        public AttackData[] Attacks
-        {
-            get => attacks;
-            private set { }
-        }
+        public AttackData[] Attacks { get; set; }
 
-        public CastleData[] Castles
-        {
-            get => castles;
-            private set { }
-        }
+        public CastleData[] Castles { get; set; }
 
-        public DefaultKnightData[] DefaultKnights
-        {
-            get => defaultKnights;
-            private set { }
-        }
+        public DefaultKnightData[] DefaultKnights { get; set; }
 
-        public ClassData[] Classes
-        {
-            get => classes;
-            private set { }
-        }
+        public ClassData[] Classes { get; set; }
 
-        public ItemData[] Items
-        {
-            get => items;
-            private set { }
-        }
+        public ItemData[] Items { get; set; }
 
-        public MonsterInSummonData[] MonstersInSummon
-        {
-            get => monstersInSummon;
-            private set { }
-        }
+        public SpecialAttackData[] SpecialAttacks { get; set; }
 
-        public SpecialAttackData[] SpecialAttacks
-        {
-            get => specialAttacks;
-            private set { }
-        }
+        public SpellData[] Spells { get; set; }
 
-        public SpellData[] Spells
-        {
-            get => spells;
-            private set { }
-        }
+        public SkillData[] Skills { get; set; }
 
-        public SkillData[] Skills
-        {
-            get => skills;
-            private set { }
-        }
 #if WORK_IN_PROGRESS
-        public StatGrowthData[] StatGrowths { get => statGrowths; private set {} }
+        public MonsterInSummonData[] MonstersInSummon { get; set; }
+        public MonsterData[] Monsters { get; set; }
+        public StatGrowthData[] StatGrowths { get; set; }
 #endif
 
         #endregion
 
-        public void Dispose()
-        {
-            MemoryMappedFile?.Dispose();
-        }
+        public void Dispose() => MemoryMappedFile?.Dispose();
     }
 }

@@ -1,3 +1,7 @@
+using System;
+using System.IO;
+using System.Net;
+using System.Security.AccessControl;
 using BrigandineGEDataEditor;
 using BrigandineGEDataEditor.DataTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,7 +11,7 @@ namespace BrigandineGEDataEditorTests
     [TestClass]
     public class MemoryTests
     {
-        public MemoryAccessor memoryAccessor = MemoryAccessor.CreateAccessor();
+        private readonly MemoryAccessor memoryAccessor = MemoryAccessor.CreateAccessor();
 
         [TestMethod]
         public void AdjustAddressTest()
@@ -44,12 +48,12 @@ namespace BrigandineGEDataEditorTests
             Assert.AreEqual("Full Blade", memoryAccessor.DereferenceString(memoryAccessor.Attacks[0].Name));
             Assert.AreEqual("Hervery", memoryAccessor.DereferenceString(memoryAccessor.Castles[0].Name));
             Assert.AreEqual(1, memoryAccessor.DefaultKnights[0].Level);
-            Assert.AreEqual("Fighter", memoryAccessor.DereferenceString((uint) memoryAccessor.Classes[0].Name));
-            Assert.AreEqual("Solomon's Ring", memoryAccessor.DereferenceString((uint) memoryAccessor.Items[0].Name));
+            Assert.AreEqual("Fighter", memoryAccessor.DereferenceString(memoryAccessor.Classes[0].Name));
+            Assert.AreEqual("Solomon's Ring", memoryAccessor.DereferenceString(memoryAccessor.Items[0].Name));
             Assert.AreEqual("Howl Fire",
-                memoryAccessor.DereferenceString((uint) memoryAccessor.SpecialAttacks[0].Name));
-            Assert.AreEqual("Heal", memoryAccessor.DereferenceString((uint) memoryAccessor.Spells[0].Name));
-            Assert.AreEqual("Nimble", memoryAccessor.DereferenceString((uint) memoryAccessor.Skills[0].Name));
+                memoryAccessor.DereferenceString(memoryAccessor.SpecialAttacks[0].Name));
+            Assert.AreEqual("Heal", memoryAccessor.DereferenceString(memoryAccessor.Spells[0].Name));
+            Assert.AreEqual("Nimble", memoryAccessor.DereferenceString(memoryAccessor.Skills[0].Name));
         }
 
         [TestMethod]
@@ -68,7 +72,7 @@ namespace BrigandineGEDataEditorTests
             Assert.AreEqual("Howl Fire", memoryAccessor.DereferenceString(firstSpecialAttackData.Name));
 
             SpellData firstSpellData = memoryAccessor.Spells[0];
-            Assert.AreEqual("Heal", memoryAccessor.DereferenceString((uint) firstSpellData.Name));
+            Assert.AreEqual("Heal", memoryAccessor.DereferenceString(firstSpellData.Name));
         }
 
         [TestMethod]
@@ -96,5 +100,6 @@ namespace BrigandineGEDataEditorTests
             if (!text.SetText(memoryAccessor, ref largerLengthString))
                 Assert.AreNotEqual("1234567", largerLengthString);
         }
+        
     }
 }

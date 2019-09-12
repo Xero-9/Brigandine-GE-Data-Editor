@@ -9,28 +9,25 @@ namespace BrigandineGEDataEditor.DataTypes
     {
         public uint Address;
 
-        public string GetText(MemoryAccessor memoryAccessor)
-        {
-            return memoryAccessor.DereferenceString(Address);
-        }
+        public string GetText(MemoryAccessor memoryAccessor) => memoryAccessor.DereferenceString(Address);
 
         public bool SetText(MemoryAccessor memoryAccessor, ref string value)
         {
             var text = memoryAccessor.DereferenceString(Address);
             if (value.Length > text.Length)
                 return false;
-            else if (value.Length == text.Length)
+            if (value.Length == text.Length)
             {
                 text = value;
                 return true;
             }
-            else if (value.Length < text.Length)
+            if (value.Length < text.Length)
             {
                 var difference = text.Length - value.Length;
                 text = value.PadRight(difference);
                 return true;
             }
-
+            //TODO Finish Writing Text Back
             return false;
         }
 

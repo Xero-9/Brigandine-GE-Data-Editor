@@ -11,11 +11,11 @@ namespace BrigandineGEDataEditor.DataTypes
         public byte MonsterSlotNumber;
         public byte Class;
         public byte Level;
-        public ushort HP;
-        public ushort MP;
-        public byte STR;
-        public byte INT;
-        public byte AGI;
+        public ushort Hp;
+        public ushort Mp;
+        public byte Str;
+        public byte Int;
+        public byte Agi;
         public byte ItemEquipped;
         public Text Name;
     }
