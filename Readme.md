@@ -1,4 +1,4 @@
-# Brigandine GE Data Editor Library
+# Brigandine GE Data Editor Library <br> [![Build](http://144.91.79.225:8111/app/rest/builds/buildType:(id:BrigandineGeDataEditor_ReleaseBuild)/statusIcon)](http://144.91.79.225:8111/viewType.html?buildTypeId=BrigandineGeDataEditor_ReleaseBuild&guest=1)[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 I built this library to make viewing and/or editing things like names,
 descriptions, and stats in Brigandine Grand Edition easier. The
 MemoryAccessor class encapsulates the functionality for reading and
